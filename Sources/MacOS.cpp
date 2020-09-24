@@ -45,7 +45,7 @@ std::string osGetZoomStatus()
 
   char *zoomStatus = execAndReturn(
       "osascript -e 'set zoomStatus to \"closed\"\nset muteStatus to \"disabled\"\n"
-      "set viewStatus to \"gallery\""
+      "set viewStatus to \"disabled\"\n"
       "set videoStatus to \"disabled\"\nset shareStatus to \"disabled\"\ntell application "
       "\"System Events\"\nif exists (window 1 of process \"zoom.us\") then\nset zoomStatus "
       "to \"open\"\ntell application process \"zoom.us\"\nif exists (menu bar item "
