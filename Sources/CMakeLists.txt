@@ -34,4 +34,6 @@ add_executable(
 )
 target_link_libraries(sdzoomplugin json StreamDeckSDK)
 install(TARGETS sdzoomplugin DESTINATION ${CMAKE_INSTALL_PREFIX})
+if (WIN32)
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dist/getZoomStatus DESTINATION ${CMAKE_INSTALL_PREFIX})
+endif()
