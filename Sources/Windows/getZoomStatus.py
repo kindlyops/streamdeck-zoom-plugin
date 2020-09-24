@@ -54,10 +54,12 @@ def GetZoomStatus():
   global zoomMeetingOpen
   global toggleMute
   global toggleVideo
+  global toggleView
   global toggleShare
   statusMute   = "unknown"
   statusVideo  = "unknown"
   statusShare  = "unknown"
+  statusView   = "unknown"
   statusRecord = "unknown"
 
   desktop   = automation.GetRootControl()
@@ -71,6 +73,24 @@ def GetZoomStatus():
     print ("desktop="+str(desktop))
     print ("window="+str(window))
     print ("toolsMenu="+str(toolsMenu))
+
+  if window != toolsMenu:
+    for control, depth in automation.WalkTree(window, getFirstChild=GetFirstChild, getNextSibling=GetNextSibling, includeTop=False, maxDepth=3):
+      if str(control).find("Gallery View (Alt+F2)") > 0:
+        statusView = "speaker"
+        print(str(control))
+        if toggleView == True:
+          print("sending keys f2")
+          automation.SendKeys('{Alt}{F2}')
+          statusView = "gallery"
+          break
+      elif str(control).find("Speaker View") > 0:
+        statusView = "gallery"
+        if toggleView == True:
+          automation.SendKeys('{Alt}{F1}')
+          statusView = "speaker"
+          break
+
   for control, depth in automation.WalkTree(toolsMenu, getFirstChild=GetFirstChild, getNextSibling=GetNextSibling, includeTop=False, maxDepth=2):
     if debug == True:
       print(str(depth) + ' ' * depth * 4 + str(control))
@@ -132,7 +152,7 @@ def GetZoomStatus():
     print("Elapsed Time:", stop-start)
 
   statusZoom = "call"
-  status = "zoomStatus:"+statusZoom+",zoomMute:"+statusMute+",zoomVideo:"+statusVideo+",zoomShare:"+statusShare
+  status = "zoomStatus:"+statusZoom+",zoomMute:"+statusMute+",zoomVideo:"+statusVideo+",zoomShare:"+statusShare+",zoomView:"+statusView
   print (status)
 
 def end_meeting():
@@ -152,7 +172,7 @@ def main():
     GetZoomStatus()
   else:
     # No Zoom Meeting Detected
-    status = "zoomStatus:closed,zoomMute:disabled,zoomVideo:disabled,zoomShare:disabled"
+    status = "zoomStatus:closed,zoomMute:disabled,zoomVideo:disabled,zoomShare:disabled,zoomView:disabled"
     print (status)
 
 if __name__ == '__main__':
@@ -162,6 +182,7 @@ if __name__ == '__main__':
   parser.add_argument("-m", "--toggle_mute", help = "Toggle Mute", action='store_true')
   parser.add_argument("-v", "--toggle_video", help = "Toggle Video", action='store_true')
   parser.add_argument("-s", "--toggle_share", help = "Toggle Share", action='store_true')
+  parser.add_argument("-t", "--toggle_view", help = "Toggle Speaker View", action='store_true')
   parser.add_argument("-e", "--end_meeting", help = "End Meeting", action='store_true')
   args = parser.parse_args()
 
@@ -177,5 +198,7 @@ if __name__ == '__main__':
     toggleVideo = True
   if args.toggle_share:
     toggleShare = True
+  if args.toggle_view:
+    toggleView = True
 
   main()

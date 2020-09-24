@@ -19,6 +19,7 @@ To install this plugin, download the com.lostdomain.zoom.sdPlugin file and doubl
 * Mute/Unmute My Audio
 * Start/Stop Video
 * Start/Stop Screen Sharing
+* Speaker/Gallery View
 
 Here's a screenshot of how it should look:
 

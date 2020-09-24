@@ -39,6 +39,24 @@
     {
       "States": [
         {
+          "Image": "streamdeck-zoom-video-speaker"
+        },
+        {
+          "Image": "streamdeck-zoom-view-gallery"
+        },
+        {
+          "Image": "streamdeck-zoom-view-closed"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Icon": "streamdeck-zoom-view-gallery",
+      "Name": "View Toggle",
+      "Tooltip": "Toggle Zoom Gallery/Speaker View",
+      "UUID": "com.lostdomain.zoom.viewtoggle"
+    },
+    {
+      "States": [
+        {
           "Image": "streamdeck-zoom-share-start"
         },
         {

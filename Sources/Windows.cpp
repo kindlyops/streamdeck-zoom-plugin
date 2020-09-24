@@ -46,6 +46,12 @@ void osToggleZoomShare()
   std::string output = exec("getZoomStatus\\getZoomStatus.exe --toggle_share");
   //ESDDebug(output.c_str());
 }
+void osToggleZoomView()
+{
+  //ESDDebug("ZoomPlugin: Sending speaker view shortcut");
+  std::string output = exec("getZoomStatus\\getZoomStatus.exe --toggle_view");
+  //ESDDebug(output.c_str());
+}
 void osToggleZoomVideo()
 {
   //ESDDebug("ZoomPlugin: Sending video shortcut");

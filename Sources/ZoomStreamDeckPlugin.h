@@ -12,6 +12,7 @@ class CallBackTimer;
 std::string osGetZoomStatus();
 void osToggleZoomMute();
 void osToggleZoomShare();
+void osToggleZoomView();
 void osToggleZoomVideo();
 void osLeaveZoomMeeting();
 void osFocusZoomWindow();

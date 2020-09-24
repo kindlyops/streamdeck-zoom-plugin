@@ -12,6 +12,7 @@
 
 #define MUTETOGGLE_ACTION_ID "com.lostdomain.zoom.mutetoggle"
 #define VIDEOTOGGLE_ACTION_ID "com.lostdomain.zoom.videotoggle"
+#define VIEWTOGGLE_ACTION_ID "com.lostdomain.zoom.viewtoggle"
 #define SHARETOGGLE_ACTION_ID "com.lostdomain.zoom.sharetoggle"
 #define FOCUS_ACTION_ID "com.lostdomain.zoom.focus"
 #define LEAVE_ACTION_ID "com.lostdomain.zoom.leave"
@@ -68,6 +69,7 @@ json getZoomStatus()
 
   std::string statusMute;
   std::string statusVideo;
+  std::string statusView;
   std::string statusShare;
   std::string statusZoom;
 
@@ -120,6 +122,17 @@ json getZoomStatus()
       statusVideo = "stopped";
     }
 
+    if (status.find("zoomView:gallery") != std::string::npos)
+    {
+      //ESDDebug("Zoom gallery view!");
+      statusView = "gallery";
+    }
+    else if (status.find("zoomView:speaker") != std::string::npos)
+    {
+      //ESDDebug("Zoom speaker view!");
+      statusView = "speaker";
+    }
+
     if (status.find("zoomShare:started") != std::string::npos)
     {
       //ESDDebug("Zoom Screen Sharing Started!");
@@ -137,6 +150,7 @@ json getZoomStatus()
   return json({{"statusZoom", statusZoom},
                {"statusMute", statusMute},
                {"statusVideo", statusVideo},
+               {"statusView", statusView},
                {"statusShare", statusShare}});
 }
 
@@ -168,6 +182,7 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
     // Status images: 0 = active, 1 = cross, 2 = disabled
     auto newMuteState = 2;
     auto newVideoState = 2;
+    auto newViewState = 2;
     auto newShareState = 2;
     auto newLeaveState = 1;
     auto newFocusState = 1;
@@ -177,6 +192,7 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
     {
       newMuteState = 2;
       newVideoState = 2;
+      newViewState = 2;
       newShareState = 2;
       newLeaveState = 1;
       newFocusState = 1;
@@ -212,6 +228,17 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
         newVideoState = 1;
       }
 
+      if (EPLJSONUtils::GetStringByName(newStatus, "statusView") == "speaker")
+      {
+        //ESDDebug("CURRENT: Zoom speaker view");
+        newViewState = 0;
+      }
+      else if (EPLJSONUtils::GetStringByName(newStatus, "statusView") == "gallery")
+      {
+        //ESDDebug("CURRENT: Zoom gallery view");
+        newViewState = 1;
+      }
+
       if (EPLJSONUtils::GetStringByName(newStatus, "statusShare") == "stopped")
       {
         newShareState = 0;
@@ -242,6 +269,15 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
       const auto button = mButtons[VIDEOTOGGLE_ACTION_ID];
       // ESDDebug("Video button context: %s", button.context.c_str());
       mConnectionManager->SetState(newVideoState, button.context);
+    }
+
+    // sanity check
+    if (mButtons.count(VIEWTOGGLE_ACTION_ID))
+    {
+      // update video button
+      const auto button = mButtons[VIEWTOGGLE_ACTION_ID];
+      // ESDDebug("Video button context: %s", button.context.c_str());
+      mConnectionManager->SetState(newViewState, button.context);
     }
 
     // sanity check
@@ -343,6 +379,22 @@ void ZoomStreamDeckPlugin::KeyUpForAction(
     osToggleZoomVideo();
     updateStatus = true;
   }
+  else if (inAction == VIEWTOGGLE_ACTION_ID)
+  {
+    // state == 0 == want to be with gallery view
+    if (state != 0)
+    {
+      ESDDebug("Switching to gallery view!");
+    }
+    // state == 1 == want to be with speaker view
+    else
+    {
+      ESDDebug("Switching to speaker view!");
+    }
+
+    osToggleZoomView();
+    updateStatus = true;
+  }
   // focus on Zoom window
   else if (inAction == FOCUS_ACTION_ID)
   {
@@ -397,6 +449,25 @@ void ZoomStreamDeckPlugin::KeyUpForAction(
       else
       {
         //ESDDebug("CURRENT: Zoom video started!");
+        newState = 1;
+      }
+    }
+    else if (inAction == VIEWTOGGLE_ACTION_ID)
+    {
+      if (EPLJSONUtils::GetStringByName(newStatus, "statusZoom") == "closed")
+      {
+        //ESDDebug("CURRENT: Zoom closed!");
+        newState = 2;
+      }
+      else if (
+          EPLJSONUtils::GetStringByName(newStatus, "statusView") == "speaker")
+      {
+        //ESDDebug("CURRENT: Zoom speaker view!");
+        newState = 0;
+      }
+      else
+      {
+        //ESDDebug("CURRENT: Zoom gallery view!");
         newState = 1;
       }
     }
