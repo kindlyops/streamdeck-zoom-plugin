@@ -71,7 +71,7 @@ std::string osGetZoomStatus()
       "\"Start Share\" of menu 1 of menu bar item \"Meeting\" of menu bar 1) then\nset "
       "shareStatus to \"stopped\"\nelse\nif exists (menu item \"Stop Share\" of menu 1 of "
       "menu bar item \"Meeting\" of menu bar 1) then\nset shareStatus to \"started\"\n"
-      "end if\nend if\nend tell\nend if\nend tell\ndo shell script \"echo zoomMute:\" & "
+      "end if\nend if\nend if\nend tell\nend if\nend tell\ndo shell script \"echo zoomMute:\" & "
       "(muteStatus as text) & \",zoomVideo:\" & (videoStatus as text) & \",zoomStatus:\" & "
       "(zoomStatus as text) & \"zoomView:\" & (viewStatus as text) & "
       "\",zoomShare:\" & (shareStatus as text)'");
