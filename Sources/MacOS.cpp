@@ -45,7 +45,7 @@ std::string osGetZoomStatus()
 
   char *zoomStatus = execAndReturn(
       "osascript -e 'set zoomStatus to \"closed\"\nset muteStatus to \"disabled\"\n"
-      "set viewStatus to \"disabled\"\n"
+      "set viewStatus to \"speaker\"\n"
       "set videoStatus to \"disabled\"\nset shareStatus to \"disabled\"\ntell application "
       "\"System Events\"\nif exists (window 1 of process \"zoom.us\") then\nset zoomStatus "
       "to \"open\"\ntell application process \"zoom.us\"\nif exists (menu bar item "
@@ -94,7 +94,7 @@ void osToggleZoomShare()
 void osToggleZoomView()
 {
   const char *script = "osascript -e 'tell application \"zoom.us\"\ntell application \"System "
-                       "Events\" to tell application process \"zoom.us\""
+                       "Events\" to tell application process \"zoom.us\"\n"
                        "keystroke \"w\" using {shift down, command down}\nend tell\nend tell'";
   system(script);
 }

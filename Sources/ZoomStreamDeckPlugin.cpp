@@ -381,6 +381,7 @@ void ZoomStreamDeckPlugin::KeyUpForAction(
   }
   else if (inAction == VIEWTOGGLE_ACTION_ID)
   {
+    ESDDebug("VIEWTOGGLE, state is %i", state);
     // state == 0 == want to be with gallery view
     if (state != 0)
     {
