@@ -39,7 +39,7 @@
     {
       "States": [
         {
-          "Image": "streamdeck-zoom-video-speaker"
+          "Image": "streamdeck-zoom-view-speaker"
         },
         {
           "Image": "streamdeck-zoom-view-gallery"
