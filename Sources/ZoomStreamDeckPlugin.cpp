@@ -470,8 +470,7 @@ void ZoomStreamDeckPlugin::KeyUpForAction(
         //ESDDebug("CURRENT: Zoom closed!");
         newState = 2;
       }
-      else if (
-          EPLJSONUtils::GetStringByName(newStatus, "statusView") == "speaker")
+      else if (EPLJSONUtils::GetStringByName(newStatus, "statusView") == "speaker")
       {
         //ESDDebug("CURRENT: Zoom speaker view!");
         newState = 0;
