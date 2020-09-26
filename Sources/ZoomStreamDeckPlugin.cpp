@@ -132,6 +132,11 @@ json getZoomStatus()
       //ESDDebug("Zoom speaker view!");
       statusView = "speaker";
     }
+    else if (status.find("zoomView:disabled") != std::string::npos)
+    {
+      //ESDDebug("Zoom speaker view!");
+      statusView = "disabled";
+    }
 
     if (status.find("zoomShare:started") != std::string::npos)
     {
@@ -237,6 +242,11 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
       {
         //ESDDebug("CURRENT: Zoom gallery view");
         newViewState = 1;
+      }
+      else if (EPLJSONUtils::GetStringByName(newStatus, "statusView") == "disabled")
+      {
+        //ESDDebug("CURRENT: Zoom view switching not available");
+        newViewState = 2;
       }
 
       if (EPLJSONUtils::GetStringByName(newStatus, "statusShare") == "stopped")
@@ -466,10 +476,15 @@ void ZoomStreamDeckPlugin::KeyUpForAction(
         //ESDDebug("CURRENT: Zoom speaker view!");
         newState = 0;
       }
-      else
+      else if (EPLJSONUtils::GetStringByName(newStatus, "statusView") == "gallery")
       {
         //ESDDebug("CURRENT: Zoom gallery view!");
         newState = 1;
+      }
+      else if (EPLJSONUtils::GetStringByName(newStatus, "statusView") == "disabled")
+      {
+        //ESDDebug("CURRENT: Zoom view selection not available!");
+        newState = 2;
       }
     }
 
