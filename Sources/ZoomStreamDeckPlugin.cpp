@@ -382,15 +382,15 @@ void ZoomStreamDeckPlugin::KeyUpForAction(
   else if (inAction == VIEWTOGGLE_ACTION_ID)
   {
     ESDDebug("VIEWTOGGLE, state is %i", state);
-    // state == 0 == want to be with gallery view
+    // state == 0 == want to be with speaker view
     if (state != 0)
     {
-      ESDDebug("Switching to gallery view!");
+      ESDDebug("Switching to speaker view!");
     }
-    // state == 1 == want to be with speaker view
+    // state == 1 == want to be with gallery view
     else
     {
-      ESDDebug("Switching to speaker view!");
+      ESDDebug("Switching to gallery view!");
     }
 
     osToggleZoomView();
