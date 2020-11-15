@@ -16,6 +16,10 @@
 #define SHARETOGGLE_ACTION_ID "com.lostdomain.zoom.sharetoggle"
 #define FOCUS_ACTION_ID "com.lostdomain.zoom.focus"
 #define LEAVE_ACTION_ID "com.lostdomain.zoom.leave"
+#define RECORDCLOUDTOGGLE_ACTION_ID "com.lostdomain.zoom.recordcloudtoggle"
+#define RECORDLOCALTOGGLE_ACTION_ID "com.lostdomain.zoom.recordlocaltoggle"
+#define MUTEALL_ACTION_ID "com.lostdomain.zoom.muteall"
+#define UNMUTEALL_ACTION_ID "com.lostdomain.zoom.unmuteall"
 
 class CallBackTimer
 {
@@ -72,6 +76,9 @@ json getZoomStatus()
   std::string statusView;
   std::string statusShare;
   std::string statusZoom;
+  std::string statusRecord;
+  std::string statusMuteAll = "enabled";
+  std::string statusUnmuteAll = "enabled";
 
   if (status.find("zoomStatus:open") != std::string::npos)
   {
@@ -96,6 +103,9 @@ json getZoomStatus()
     statusMute = "disabled";
     statusVideo = "disabled";
     statusShare = "disabled";
+    statusRecord = "disabled";
+    statusMuteAll = "disabled";
+    statusUnmuteAll = "disabled";
   }
   else
   {
@@ -148,6 +158,17 @@ json getZoomStatus()
       //ESDDebug("Zoom Screen Sharing Stopped!");
       statusShare = "stopped";
     }
+
+    if (status.find("zoomRecord:started") != std::string::npos)
+    {
+      //ESDDebug("Zoom Record Started!");
+      statusRecord = "started";
+    }
+    else if (status.find("zoomRecord:stopped") != std::string::npos)
+    {
+      //ESDDebug("Zoom Record Stopped!");
+      statusRecord = "stopped";
+    }
   }
 
   //ESDDebug("Zoom status: %s", status);
@@ -156,7 +177,10 @@ json getZoomStatus()
                {"statusMute", statusMute},
                {"statusVideo", statusVideo},
                {"statusView", statusView},
-               {"statusShare", statusShare}});
+               {"statusRecord", statusRecord},
+               {"statusShare", statusShare},
+               {"statusMuteAll", statusMuteAll},
+               {"statusUnmuteAll", statusUnmuteAll}});
 }
 
 ZoomStreamDeckPlugin::ZoomStreamDeckPlugin()
@@ -190,7 +214,10 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
     auto newViewState = 2;
     auto newShareState = 2;
     auto newLeaveState = 1;
+    auto newRecordState = 2;
     auto newFocusState = 1;
+    auto newMuteAllState = 1;
+    auto newUnmuteAllState = 1;
 
     // set mute, video, sharing, and focus to disabled when Zoom is closed
     if (EPLJSONUtils::GetStringByName(newStatus, "statusZoom") == "closed")
@@ -201,6 +228,9 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
       newShareState = 2;
       newLeaveState = 1;
       newFocusState = 1;
+      newRecordState = 2;
+      newMuteAllState = 1;
+      newUnmuteAllState = 1;
     }
     else if (EPLJSONUtils::GetStringByName(newStatus, "statusZoom") == "open")
     {
@@ -257,13 +287,25 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
       {
         newShareState = 1;
       }
+      if (EPLJSONUtils::GetStringByName(newStatus, "statusRecord") == "stopped")
+      {
+        //ESDDebug("CURRENT: Zoom record stopped");
+        newRecordState = 0;
+      }
+      else if (EPLJSONUtils::GetStringByName(newStatus, "statusRecord") == "started")
+      {
+        //ESDDebug("CURRENT: Zoom record started");
+        newRecordState = 1;
+      }
 
-      // in a call, always have leave and focus enabled
+      // in a call, always have leave, focus, mute all and unmute all enabled
       newLeaveState = 0;
       newFocusState = 0;
+      newMuteAllState = 0;
+      newUnmuteAllState = 0;
     }
 
-    // sanity check
+    // sanity check - is the button added?
     if (mButtons.count(MUTETOGGLE_ACTION_ID))
     {
       // update mute button
@@ -272,7 +314,7 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
       mConnectionManager->SetState(newMuteState, button.context);
     }
 
-    // sanity check
+    // sanity check - is the button added?
     if (mButtons.count(VIDEOTOGGLE_ACTION_ID))
     {
       // update video button
@@ -281,7 +323,7 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
       mConnectionManager->SetState(newVideoState, button.context);
     }
 
-    // sanity check
+    // sanity check - is the button added?
     if (mButtons.count(VIEWTOGGLE_ACTION_ID))
     {
       // update video button
@@ -290,7 +332,7 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
       mConnectionManager->SetState(newViewState, button.context);
     }
 
-    // sanity check
+    // sanity check - is the button added?
     if (mButtons.count(SHARETOGGLE_ACTION_ID))
     {
       // update video button
@@ -299,7 +341,7 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
       mConnectionManager->SetState(newShareState, button.context);
     }
 
-    // sanity check
+    // sanity check - is the button added?
     if (mButtons.count(LEAVE_ACTION_ID))
     {
       // update leave button
@@ -308,13 +350,48 @@ void ZoomStreamDeckPlugin::UpdateZoomStatus()
       mConnectionManager->SetState(newLeaveState, button.context);
     }
 
-    // sanity check
+    // sanity check - is the button added?
     if (mButtons.count(FOCUS_ACTION_ID))
     {
       // update focus button
       const auto button = mButtons[FOCUS_ACTION_ID];
       // ESDDebug("Focus button context: %s", button.context.c_str());
       mConnectionManager->SetState(newFocusState, button.context);
+    }
+
+    // sanity check - is the button added?
+    if (mButtons.count(RECORDLOCALTOGGLE_ACTION_ID))
+    {
+      // update record button
+      const auto button = mButtons[RECORDLOCALTOGGLE_ACTION_ID];
+      // ESDDebug("Record button context: %s", button.context.c_str());
+      mConnectionManager->SetState(newRecordState, button.context);
+    }
+    // sanity check - is the button added?
+    if (mButtons.count(RECORDCLOUDTOGGLE_ACTION_ID))
+    {
+      // update record button
+      const auto button = mButtons[RECORDCLOUDTOGGLE_ACTION_ID];
+      // ESDDebug("Record button context: %s", button.context.c_str());
+      mConnectionManager->SetState(newRecordState, button.context);
+    }
+
+    // sanity check - is the button added?
+    if (mButtons.count(MUTEALL_ACTION_ID))
+    {
+      // update mute all button
+      const auto button = mButtons[MUTEALL_ACTION_ID];
+      // ESDDebug("Record button context: %s", button.context.c_str());
+      mConnectionManager->SetState(newMuteAllState, button.context);
+    }
+
+    // sanity check - is the button added?
+    if (mButtons.count(UNMUTEALL_ACTION_ID))
+    {
+      // update unmute all button
+      const auto button = mButtons[UNMUTEALL_ACTION_ID];
+      // ESDDebug("Record button context: %s", button.context.c_str());
+      mConnectionManager->SetState(newUnmuteAllState, button.context);
     }
   }
 }
@@ -420,12 +497,14 @@ void ZoomStreamDeckPlugin::KeyUpForAction(
     osLeaveZoomMeeting();
   }
 
-  if (updateStatus)
+  // toggles cloud recording
+  else if (inAction == RECORDCLOUDTOGGLE_ACTION_ID)
   {
-    // make sure we're synchronised to the actual status by requesting the
-    // current status
-    json newStatus = getZoomStatus();
+    ESDDebug("Toggling Recording to the Cloud");
+    osToggleZoomRecordCloud();
+  }
 
+<<<<<<< HEAD
     if (inAction == MUTETOGGLE_ACTION_ID)
     {
       if (EPLJSONUtils::GetStringByName(newStatus, "statusZoom") == "closed")
@@ -486,28 +565,32 @@ void ZoomStreamDeckPlugin::KeyUpForAction(
         newState = 2;
       }
     }
+=======
+  // toggles local recording
+  else if (inAction == RECORDLOCALTOGGLE_ACTION_ID)
+  {
+    ESDDebug("Toggling Recording Locally");
+    osToggleZoomRecordLocal();
+  }
+>>>>>>> master
 
-    else if (inAction == SHARETOGGLE_ACTION_ID)
-    {
-      if (EPLJSONUtils::GetStringByName(newStatus, "statusZoom") == "closed")
-      {
-        //ESDDebug("CURRENT: Zoom closed!");
-        newState = 2;
-      }
-      else if (
-          EPLJSONUtils::GetStringByName(newStatus, "statusShare") == "stopped")
-      {
-        //ESDDebug("CURRENT: Zoom screen sharing stopped!");
-        newState = 0;
-      }
-      else
-      {
-        //ESDDebug("CURRENT: Zoom screen sharing started!");
-        newState = 1;
-      }
-    }
+  // muting all partitipants in a group meeting
+  else if (inAction == MUTEALL_ACTION_ID)
+  {
+    ESDDebug("Muting all Participants");
+    osMuteAll();
+  }
 
-    mConnectionManager->SetState(newState, inContext);
+  // toggles local recording
+  else if (inAction == UNMUTEALL_ACTION_ID)
+  {
+    ESDDebug("Asking all Participants to Unmute");
+    osUnmuteAll();
+  }
+
+  if (updateStatus)
+  {
+    UpdateZoomStatus();
   }
 }
 
