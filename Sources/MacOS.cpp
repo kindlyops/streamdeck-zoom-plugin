@@ -86,6 +86,7 @@ do shell script "echo zoomMute:" & (muteStatus as text) & ",zoomVideo:" & (video
   const char *appleScript = "set zoomStatus to \"closed\"\n"
                             "set muteStatus to \"disabled\"\n"
                             "set videoStatus to \"disabled\"\n"
+                            "set viewStatus to \"disabled\"\n"
                             "set shareStatus to \"disabled\"\n"
                             "set recordStatus to \"disabled\"\n"
                             "set speakerViewStatus to \"disabled\"\n"
@@ -106,6 +107,11 @@ do shell script "echo zoomMute:" & (muteStatus as text) & ",zoomVideo:" & (video
                             "				else\n"
                             "					set videoStatus to \"started\"\n"
                             "				end if\n"
+                            "				if exists (menu item \"Speaker View\" of menu 1 of menu bar item \"Meeting\" of menu bar 1) then\n"
+                            "					set viewStatus to \"gallery\"\n"
+                            "				else if exists (menu item \"Gallery View\" of menu 1 of menu bar item \"Meeting\" of menu bar 1) then\n"
+                            "					set viewStatus to \"speaker\"\n"
+                            "				end if\n"
                             "				if exists (menu item \"Start Share\" of menu 1 of menu bar item \"Meeting\" of menu bar 1) then\n"
                             "					set shareStatus to \"stopped\"\n"
                             "				else\n"
@@ -122,7 +128,7 @@ do shell script "echo zoomMute:" & (muteStatus as text) & ",zoomVideo:" & (video
                             "		end tell\n"
                             "	end if\n"
                             "end tell\n"
-                            "do shell script \"echo zoomMute:\" & (muteStatus as text) & \",zoomVideo:\" & (videoStatus as text) & \",zoomStatus:\" & (zoomStatus as text) & \",zoomShare:\" & (shareStatus as text) & \",zoomRecord:\" & (recordStatus as text)";
+                            "do shell script \"echo zoomMute:\" & (muteStatus as text) & \",zoomView:\" & (viewStatus as text) & \",zoomVideo:\" & (videoStatus as text) & \",zoomStatus:\" & (zoomStatus as text) & \",zoomShare:\" & (shareStatus as text) & \",zoomRecord:\" & (recordStatus as text)";
 
   std::string cmd = "osascript -e '";
   cmd.append(appleScript);
@@ -164,9 +170,16 @@ void osToggleZoomShare()
 
 void osToggleZoomView()
 {
-  const char *script = "osascript -e 'tell application \"zoom.us\"\ntell application \"System "
-                       "Events\" to tell application process \"zoom.us\"\n"
-                       "keystroke \"w\" using {shift down, command down}\nend tell\nend tell'";
+  const char *script = "osascript -e '"
+                       "tell application \"zoom.us\"\n"
+                       "  tell application \"System Events\" to tell application process \"zoom.us\"\n"
+                       "    if exists (menu item \"Speaker View\" of menu 1 of menu bar item \"Meeting\" of menu bar 1) then\n"
+                       "      click (menu item \"Speaker View\" of menu 1 of menu bar item \"Meeting\" of menu bar 1)\n"
+                       "    else if exists (menu item \"Gallery View\" of menu 1 of menu bar item \"Meeting\" of menu bar 1) then\n"
+                       "      click (menu item \"Gallery View\" of menu 1 of menu bar item \"Meeting\" of menu bar 1)\n"
+                       "    end if\n"
+                       "  end tell\n"
+                       "end tell\n";
   system(script);
 }
 

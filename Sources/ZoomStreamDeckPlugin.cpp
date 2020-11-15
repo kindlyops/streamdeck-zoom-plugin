@@ -504,75 +504,12 @@ void ZoomStreamDeckPlugin::KeyUpForAction(
     osToggleZoomRecordCloud();
   }
 
-<<<<<<< HEAD
-    if (inAction == MUTETOGGLE_ACTION_ID)
-    {
-      if (EPLJSONUtils::GetStringByName(newStatus, "statusZoom") == "closed")
-      {
-        //ESDDebug("CURRENT: Zoom closed!");
-        newState = 2;
-      }
-      else if (EPLJSONUtils::GetStringByName(newStatus, "statusMute") == "muted")
-      {
-        //ESDDebug("CURRENT: Zoom muted!");
-        newState = 0;
-      }
-      else
-      {
-        //ESDDebug("CURRENT: Zoom unmuted!");
-        newState = 1;
-      }
-    }
-    else if (inAction == VIDEOTOGGLE_ACTION_ID)
-    {
-      if (EPLJSONUtils::GetStringByName(newStatus, "statusZoom") == "closed")
-      {
-        //ESDDebug("CURRENT: Zoom closed!");
-        newState = 2;
-      }
-      else if (
-          EPLJSONUtils::GetStringByName(newStatus, "statusVideo") == "stopped")
-      {
-        //ESDDebug("CURRENT: Zoom video stopped!");
-        newState = 0;
-      }
-      else
-      {
-        //ESDDebug("CURRENT: Zoom video started!");
-        newState = 1;
-      }
-    }
-    else if (inAction == VIEWTOGGLE_ACTION_ID)
-    {
-      if (EPLJSONUtils::GetStringByName(newStatus, "statusZoom") == "closed")
-      {
-        //ESDDebug("CURRENT: Zoom closed!");
-        newState = 2;
-      }
-      else if (EPLJSONUtils::GetStringByName(newStatus, "statusView") == "speaker")
-      {
-        //ESDDebug("CURRENT: Zoom speaker view!");
-        newState = 0;
-      }
-      else if (EPLJSONUtils::GetStringByName(newStatus, "statusView") == "gallery")
-      {
-        //ESDDebug("CURRENT: Zoom gallery view!");
-        newState = 1;
-      }
-      else if (EPLJSONUtils::GetStringByName(newStatus, "statusView") == "disabled")
-      {
-        //ESDDebug("CURRENT: Zoom view selection not available!");
-        newState = 2;
-      }
-    }
-=======
   // toggles local recording
   else if (inAction == RECORDLOCALTOGGLE_ACTION_ID)
   {
     ESDDebug("Toggling Recording Locally");
     osToggleZoomRecordLocal();
   }
->>>>>>> master
 
   // muting all partitipants in a group meeting
   else if (inAction == MUTEALL_ACTION_ID)

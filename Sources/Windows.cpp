@@ -15,6 +15,7 @@ void altPlusKey(UINT key);
 std::string g_statusZoom = "stopped";
 std::string g_statusMute = "unknown";
 std::string g_statusVideo = "unknown";
+std::string g_statusView = "unknown";
 std::string g_statusShare = "unknown";
 std::string g_statusRecord = "unknown";
 std::string g_windowName = "unknown";
@@ -38,6 +39,7 @@ std::string formatStatus()
   ss << "zoomStatus:" << g_statusZoom << ",";
   ss << "zoomMute:" << g_statusMute << ",";
   ss << "zoomVideo:" << g_statusVideo << ",";
+  ss << "zoomView:" << g_statusView << ",";
   ss << "zoomRecord:" << g_statusRecord << ",";
   ss << "zoomShare:" << g_statusShare;
   return ss.str();
@@ -203,6 +205,15 @@ void rawListDescendants(IUIAutomationElement *pParent, std::string windowType)
           g_statusVideo = "started";
         }
 
+        if (strName.find(L"Gallery View") != std::string::npos)
+        {
+          g_statusVideo = "speaker";
+        }
+        if (strName.find(L"Speaker View") != std::string::npos)
+        {
+          g_statusVideo = "gallery";
+        }
+
         if (strName.find(L"Share Screen") != std::string::npos)
         {
           g_statusShare = "stopped";
@@ -241,6 +252,7 @@ void rawListDescendants(IUIAutomationElement *pParent, std::string windowType)
         // you cannot minimize the window while recording
         g_statusRecord = "stopped";
         g_statusShare = "stopped";
+        g_statusView = "disabled";
       }
 
       // we're looking for different buttons per window. This is the Zoom window when you're sharing
@@ -268,6 +280,7 @@ void rawListDescendants(IUIAutomationElement *pParent, std::string windowType)
         g_statusShare = "started";
         // can't read record button in this view
         g_statusRecord = "disabled";
+        g_statusView = "disabled";
       }
     }
 
@@ -330,8 +343,13 @@ void osToggleZoomShare()
 void osToggleZoomView()
 {
   //ESDDebug("ZoomPlugin: Sending speaker view shortcut");
-  std::string output = exec("getZoomStatus\\getZoomStatus.exe --toggle_view");
-  //ESDDebug(output.c_str());
+  osFocusZoomWindow();
+  ::keybd_event(VK_CONTROL, 0, 0, 0);
+  ::keybd_event(VK_MENU, 0, 0, 0);
+  ::keybd_event(0x31, 0, 0, 0); // virtual key code for '1
+  keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
+  keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0);
+  keybd_event(0x31, 0, KEYEVENTF_KEYUP, 0); // virtual key code for '1'
 }
 void osToggleZoomVideo()
 {
