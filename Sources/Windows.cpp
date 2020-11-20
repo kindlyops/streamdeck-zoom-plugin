@@ -8,7 +8,7 @@
 #include <sstream>
 #include <regex>
 
-IUIAutomationElement *GetTopLevelWindowByName(LPWSTR windowName);
+IUIAutomationElement *GetTopLevelWindowByName(LPCWSTR windowName);
 void rawListDescendants(IUIAutomationElement *pParent, std::string windowType);
 void altPlusKey(UINT key);
 
@@ -87,7 +87,7 @@ std::string osGetZoomStatus()
   return formatStatus();
 }
 
-IUIAutomationElement *GetTopLevelWindowByName(LPWSTR windowName)
+IUIAutomationElement *GetTopLevelWindowByName(LPCWSTR windowName)
 {
   if (windowName == NULL)
   {
@@ -104,6 +104,7 @@ IUIAutomationElement *GetTopLevelWindowByName(LPWSTR windowName)
 
   IUIAutomationElement *pRoot = NULL;
   IUIAutomationElement *pFound = NULL;
+  IUIAutomationCondition *pCondition = NULL;
 
   // Get the desktop element.
   HRESULT hr = g_pAutomation->GetRootElement(&pRoot);
@@ -113,7 +114,6 @@ IUIAutomationElement *GetTopLevelWindowByName(LPWSTR windowName)
   }
 
   // Get a top-level element by name, such as "Program Manager"
-  IUIAutomationCondition *pCondition = NULL;
   hr = g_pAutomation->CreatePropertyCondition(UIA_NamePropertyId, varProp, &pCondition);
   if (FAILED(hr))
   {
