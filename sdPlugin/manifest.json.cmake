@@ -178,7 +178,7 @@
   "Category": "Zoom",
   "CategoryIcon": "video-camera",
   "PropertyInspectorPath": "propertyinspector/index.html",
-  "Icon": "video-camera-plugin",
+  "Icon": "video-camera",
   "Version": "${CMAKE_PROJECT_VERSION}",
   "OS": [
     {
